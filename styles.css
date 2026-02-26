@@ -843,3 +843,83 @@ textarea:focus {
         align-items: stretch;
     }
 }
+
+/* WCAG: focus visibility */
+:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* White Sign In Button */
+.btn-signin {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000;
+}
+
+.btn-signin:hover {
+  background: #f3f4f6;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+}
+
+.modal-content {
+  background: #ffffff;
+  color: #000000;
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+  border-radius: 12px;
+  position: relative;
+}
+
+/* Close button */
+.modal-close {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Error messages */
+.error-message {
+  font-size: 0.85rem;
+  color: #b91c1c; /* WCAG AA contrast */
+}
+
+/* Link style */
+.link-button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Accessibility helper */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
