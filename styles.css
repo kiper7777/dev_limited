@@ -923,3 +923,15 @@ textarea:focus {
   clip: rect(0 0 0 0);
 }
 
+
+
+#authModal,
+#authOverlay {
+  display: none;
+}
+#authModal.open,
+#authOverlay.open {
+  display: block;
+}
+
+

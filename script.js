@@ -49,139 +49,64 @@ window.addEventListener('scroll', () => {
     }
 });
 
+
 // Dynamic year in footer
 const yearSpan = document.getElementById('year');
 if (yearSpan) {
     yearSpan.textContent = new Date().getFullYear();
 }
 
-const openBtn = document.getElementById('openSignIn');
-const modal = document.getElementById('authModal');
-const overlay = document.getElementById('authOverlay');
-const closeBtn = document.getElementById('closeModal');
+document.addEventListener("DOMContentLoaded", function () {
 
-const signInForm = document.getElementById('signInForm');
-const signUpForm = document.getElementById('signUpForm');
+  const modal = document.getElementById("authModal");
+  const overlay = document.getElementById("authOverlay");
+  const openBtn = document.getElementById("openSignIn");
+  const closeBtn = document.getElementById("closeModal");
 
-const switchToSignUp = document.getElementById('switchToSignUp');
-const switchToSignIn = document.getElementById('switchToSignIn');
+  const signInForm = document.getElementById("signInForm");
+  const signUpForm = document.getElementById("signUpForm");
 
-let lastFocusedElement;
+  const switchToSignUp = document.getElementById("switchToSignUp");
+  const switchToSignIn = document.getElementById("switchToSignIn");
 
-// Open modal
-openBtn.addEventListener('click', () => {
+  let lastFocusedElement;
+
+function openModal() {
   lastFocusedElement = document.activeElement;
-  modal.hidden = false;
-  overlay.hidden = false;
-  document.getElementById('loginEmail').focus();
-});
+  modal.classList.add("open");
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+  document.getElementById("loginEmail").focus();
+}
 
-// Close modal
 function closeModal() {
-  modal.hidden = true;
-  overlay.hidden = true;
-  lastFocusedElement.focus();
+  modal.classList.remove("open");
+  overlay.classList.remove("open");
+  document.body.style.overflow = "";
+  if (lastFocusedElement) lastFocusedElement.focus();
 }
 
-closeBtn.addEventListener('click', closeModal);
-overlay.addEventListener('click', closeModal);
 
-// ESC close
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !modal.hidden) {
-    closeModal();
-  }
+  openBtn.addEventListener("click", openModal);
+  closeBtn.addEventListener("click", closeModal);
+  overlay.addEventListener("click", closeModal);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !modal.hidden) {
+      closeModal();
+    }
+  });
+
+  switchToSignUp.addEventListener("click", function () {
+    signInForm.hidden = true;
+    signUpForm.hidden = false;
+    document.getElementById("registerName").focus();
+  });
+
+  switchToSignIn.addEventListener("click", function () {
+    signUpForm.hidden = true;
+    signInForm.hidden = false;
+    document.getElementById("loginEmail").focus();
+  });
+
 });
-
-// Switch forms
-switchToSignUp.addEventListener('click', () => {
-  signInForm.hidden = true;
-  signUpForm.hidden = false;
-  document.getElementById('registerName').focus();
-});
-
-switchToSignIn.addEventListener('click', () => {
-  signUpForm.hidden = true;
-  signInForm.hidden = false;
-  document.getElementById('loginEmail').focus();
-});
-
-// Validation helper
-function showError(input, message) {
-  const error = document.getElementById(input.id + "Error");
-  error.textContent = message;
-  input.setAttribute("aria-invalid", "true");
-}
-
-function clearError(input) {
-  const error = document.getElementById(input.id + "Error");
-  error.textContent = "";
-  input.removeAttribute("aria-invalid");
-}
-
-// LOGIN
-document.getElementById('loginForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  
-  const email = loginEmail;
-  const password = loginPassword;
-
-  let valid = true;
-
-  if (!email.value) {
-    showError(email, "Email is required");
-    valid = false;
-  } else {
-    clearError(email);
-  }
-
-  if (!password.value) {
-    showError(password, "Password is required");
-    valid = false;
-  } else {
-    clearError(password);
-  }
-
-  if (valid) {
-    alert("Signed in successfully (demo)");
-    closeModal();
-  }
-});
-
-// REGISTER
-document.getElementById('registerForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  
-  const name = registerName;
-  const email = registerEmail;
-  const password = registerPassword;
-
-  let valid = true;
-
-  if (!name.value) {
-    showError(name, "Name is required");
-    valid = false;
-  } else {
-    clearError(name);
-  }
-
-  if (!email.value) {
-    showError(email, "Email is required");
-    valid = false;
-  } else {
-    clearError(email);
-  }
-
-  if (password.value.length < 6) {
-    showError(password, "Password must be at least 6 characters");
-    valid = false;
-  } else {
-    clearError(password);
-  }
-
-  if (valid) {
-    alert("Account created successfully (demo)");
-    closeModal();
-  }
-});
-
