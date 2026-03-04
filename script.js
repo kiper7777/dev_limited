@@ -57,7 +57,6 @@ if (yearSpan) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-
   const modal = document.getElementById("authModal");
   const overlay = document.getElementById("authOverlay");
   const openBtn = document.getElementById("openSignIn");
@@ -71,42 +70,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let lastFocusedElement;
 
-function openModal() {
-  lastFocusedElement = document.activeElement;
-  modal.classList.add("open");
-  overlay.classList.add("open");
-  document.body.style.overflow = "hidden";
-  document.getElementById("loginEmail").focus();
-}
+  function openModal() {
+    lastFocusedElement = document.activeElement;
+    modal.classList.add("open");
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+    document.getElementById("loginEmail").focus();
+  }
 
-function closeModal() {
-  modal.classList.remove("open");
-  overlay.classList.remove("open");
-  document.body.style.overflow = "";
-  if (lastFocusedElement) lastFocusedElement.focus();
-}
+  function closeModal() {
+    modal.classList.remove("open");
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+    if (lastFocusedElement) lastFocusedElement.focus();
+  }
 
-
-  openBtn.addEventListener("click", openModal);
-  closeBtn.addEventListener("click", closeModal);
-  overlay.addEventListener("click", closeModal);
+  if (openBtn) openBtn.addEventListener("click", openModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (overlay) overlay.addEventListener("click", closeModal);
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !modal.hidden) {
+    if (e.key === "Escape" && modal.classList.contains("open")) {
       closeModal();
     }
   });
 
-  switchToSignUp.addEventListener("click", function () {
-    signInForm.hidden = true;
-    signUpForm.hidden = false;
-    document.getElementById("registerName").focus();
-  });
+  if (switchToSignUp) {
+    switchToSignUp.addEventListener("click", function () {
+      signInForm.classList.add("hidden");
+      signUpForm.classList.remove("hidden");
+      document.getElementById("registerName").focus();
+    });
+  }
 
-  switchToSignIn.addEventListener("click", function () {
-    signUpForm.hidden = true;
-    signInForm.hidden = false;
-    document.getElementById("loginEmail").focus();
-  });
-
+  if (switchToSignIn) {
+    switchToSignIn.addEventListener("click", function () {
+      signUpForm.classList.add("hidden");
+      signInForm.classList.remove("hidden");
+      document.getElementById("loginEmail").focus();
+    });
+  }
 });
