@@ -89,25 +89,102 @@ document.addEventListener("DOMContentLoaded", function () {
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   if (overlay) overlay.addEventListener("click", closeModal);
 
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && modal.classList.contains("open")) {
-      closeModal();
-    }
-  });
+  // ESC close
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !modal.hidden) {
+    closeModal();
+  }
+});
 
-  if (switchToSignUp) {
-    switchToSignUp.addEventListener("click", function () {
-      signInForm.classList.add("hidden");
-      signUpForm.classList.remove("hidden");
-      document.getElementById("registerName").focus();
-    });
+  // Switch forms
+switchToSignUp.addEventListener('click', () => {
+  signInForm.hidden = true;
+  signUpForm.hidden = false;
+  document.getElementById('registerName').focus();
+});
+
+switchToSignIn.addEventListener('click', () => {
+  signUpForm.hidden = true;
+  signInForm.hidden = false;
+  document.getElementById('loginEmail').focus();
+});
+
+// Validation helper
+function showError(input, message) {
+  const error = document.getElementById(input.id + "Error");
+  error.textContent = message;
+  input.setAttribute("aria-invalid", "true");
+}
+
+function clearError(input) {
+  const error = document.getElementById(input.id + "Error");
+  error.textContent = "";
+  input.removeAttribute("aria-invalid");
+}
+
+// LOGIN
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  const email = loginEmail;
+  const password = loginPassword;
+
+  let valid = true;
+
+  if (!email.value) {
+    showError(email, "Email is required");
+    valid = false;
+  } else {
+    clearError(email);
   }
 
-  if (switchToSignIn) {
-    switchToSignIn.addEventListener("click", function () {
-      signUpForm.classList.add("hidden");
-      signInForm.classList.remove("hidden");
-      document.getElementById("loginEmail").focus();
-    });
+  if (!password.value) {
+    showError(password, "Password is required");
+    valid = false;
+  } else {
+    clearError(password);
   }
+
+  if (valid) {
+    alert("Signed in successfully (demo)");
+    closeModal();
+  }
+});
+
+// REGISTER
+document.getElementById('registerForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  const name = registerName;
+  const email = registerEmail;
+  const password = registerPassword;
+
+  let valid = true;
+
+  if (!name.value) {
+    showError(name, "Name is required");
+    valid = false;
+  } else {
+    clearError(name);
+  }
+
+  if (!email.value) {
+    showError(email, "Email is required");
+    valid = false;
+  } else {
+    clearError(email);
+  }
+
+  if (password.value.length < 6) {
+    showError(password, "Password must be at least 6 characters");
+    valid = false;
+  } else {
+    clearError(password);
+  }
+
+  if (valid) {
+    alert("Account created successfully (demo)");
+    closeModal();
+  }
+});
 });
