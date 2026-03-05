@@ -931,7 +931,7 @@ textarea:focus {
 }
 #authModal.open,
 #authOverlay.open {
-  display: block;
+  display: flex;
 }
 
 
