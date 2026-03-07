@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,32 +22,8 @@
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="site-header" id="top">
-        <div class="container header-inner">
-            <a href="#top" class="logo">
-                <span class="logo-mark">Dev.in</span><span class="logo-text">solutions</span>
-                <span class="logo-tagline">Development of Innovative Solutions</span>
-            </a>
 
-            <nav class="main-nav">
-                <button class="nav-toggle" aria-label="Toggle navigation">
-                    <span></span>
-                    <span></span>
-                </button>
-                <ul class="nav-links">
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#solutions">Solutions</a></li>
-                    <li><a href="#process">Process</a></li>
-                    <li><a href="#cases">Case Studies</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact" class="btn btn-sm btn-primary">Let’s talk</a></li>
-                    <button class="btn btn-signin" id="openSignIn">Sign In</button>
-
-                </ul>
-            </nav>
-        </div>
-    </header>
+<?php include "header.php"; ?>
 
     <!-- Hero -->
     <main>
@@ -416,87 +396,90 @@
         </div>
     </footer>
 
-    <!-- Overlay -->
-    <div class="modal-overlay" id="authOverlay" hidden></div>
+     <div id="authMessage" class="auth-message" aria-live="polite" role="status"></div>
 
-    <!-- Auth Modal -->
-    <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle"
-        aria-describedby="authDescription" hidden>
+    <div class="modal-overlay" id="authOverlay" aria-hidden="true"></div>
+
+    <div
+        class="modal"
+        id="authModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="authTitle"
+        aria-describedby="authDescription"
+        aria-hidden="true"
+    >
         <div class="modal-content">
-
-            <button class="modal-close" id="closeModal" aria-label="Close dialog">
+            <button class="modal-close" id="closeModal" aria-label="Close dialog" type="button">
                 &times;
             </button>
 
-            <!-- SIGN IN -->
             <div id="signInForm">
                 <h2 id="authTitle">Sign In</h2>
-                <p id="authDescription" class="visually-hidden">
-                    Enter your email and password to sign in.
+                <p id="authDescription" class="modal-description">
+                    Enter your email and password to access your Dev Limited account.
                 </p>
 
                 <form id="loginForm" novalidate>
                     <div class="form-field">
                         <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" required />
-                        <span class="error-message" id="loginEmailError"></span>
+                        <input type="email" id="loginEmail" name="loginEmail" autocomplete="email" required aria-describedby="loginEmailError">
+                        <span class="error-message" id="loginEmailError" aria-live="polite"></span>
                     </div>
 
                     <div class="form-field">
                         <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required minlength="6" />
-                        <span class="error-message" id="loginPasswordError"></span>
+                        <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" required aria-describedby="loginPasswordError">
+                        <span class="error-message" id="loginPasswordError" aria-live="polite"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-full">
-                        Sign In
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-full">Sign In</button>
                 </form>
 
                 <p class="switch-text">
-                    Not registered yet?
-                    <button class="link-button" id="switchToSignUp">
-                        Click here
+                    Еще не зарегистрирован?
+                    <button class="link-button" id="switchToSignUp" type="button">
+                        Нажми здесь
                     </button>
                 </p>
             </div>
 
-            <!-- SIGN UP -->
+
             <div id="signUpForm" hidden>
                 <h2>Sign Up</h2>
+                <p class="modal-description">
+                    Create your Dev Limited account to access our digital solutions platform.
+                </p>
 
                 <form id="registerForm" novalidate>
                     <div class="form-field">
                         <label for="registerName">Full Name</label>
-                        <input type="text" id="registerName" required />
-                        <span class="error-message" id="registerNameError"></span>
+                        <input type="text" id="registerName" name="registerName" autocomplete="name" required aria-describedby="registerNameError">
+                        <span class="error-message" id="registerNameError" aria-live="polite"></span>
                     </div>
 
                     <div class="form-field">
                         <label for="registerEmail">Email</label>
-                        <input type="email" id="registerEmail" required />
-                        <span class="error-message" id="registerEmailError"></span>
+                        <input type="email" id="registerEmail" name="registerEmail" autocomplete="email" required aria-describedby="registerEmailError">
+                        <span class="error-message" id="registerEmailError" aria-live="polite"></span>
                     </div>
 
                     <div class="form-field">
                         <label for="registerPassword">Password</label>
-                        <input type="password" id="registerPassword" required minlength="6" />
-                        <span class="error-message" id="registerPasswordError"></span>
+                        <input type="password" id="registerPassword" name="registerPassword" autocomplete="new-password" required minlength="6" aria-describedby="registerPasswordError">
+                        <span class="error-message" id="registerPasswordError" aria-live="polite"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-full">
-                        Create Account
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
                 </form>
 
                 <p class="switch-text">
-                    Already have an account?
-                    <button class="link-button" id="switchToSignIn">
+                    Уже есть аккаунт?
+                    <button class="link-button" id="switchToSignIn" type="button">
                         Sign In
                     </button>
                 </p>
             </div>
-
         </div>
     </div>
 

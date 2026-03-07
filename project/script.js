@@ -4,15 +4,17 @@ const navLinks = document.querySelector('.nav-links');
 
 if (navToggle && navLinks) {
     navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
         navToggle.classList.toggle('open');
-        navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
-    // Close nav on link click (mobile)
     navLinks.addEventListener('click', (e) => {
-        if (e.target.tagName.toLowerCase() === 'a') {
-            navToggle.classList.remove('open');
+        const target = e.target;
+        if (target.tagName.toLowerCase() === 'a') {
             navLinks.classList.remove('open');
+            navToggle.classList.remove('open');
+            navToggle.setAttribute('aria-expanded', 'false');
         }
     });
 }
@@ -42,13 +44,13 @@ const header = document.querySelector('.site-header');
 
 window.addEventListener('scroll', () => {
     if (!header) return;
+
     if (window.scrollY > 12) {
         header.classList.add('scrolled');
     } else {
         header.classList.remove('scrolled');
     }
 });
-
 
 // Dynamic year in footer
 const yearSpan = document.getElementById('year');
@@ -57,134 +59,267 @@ if (yearSpan) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  const modal = document.getElementById("authModal");
-  const overlay = document.getElementById("authOverlay");
-  const openBtn = document.getElementById("openSignIn");
-  const closeBtn = document.getElementById("closeModal");
+    const modal = document.getElementById("authModal");
+    const overlay = document.getElementById("authOverlay");
+    const openBtn = document.getElementById("openSignIn");
+    const closeBtn = document.getElementById("closeModal");
 
-  const signInForm = document.getElementById("signInForm");
-  const signUpForm = document.getElementById("signUpForm");
+    const signInFormBlock = document.getElementById("signInForm");
+    const signUpFormBlock = document.getElementById("signUpForm");
 
-  const switchToSignUp = document.getElementById("switchToSignUp");
-  const switchToSignIn = document.getElementById("switchToSignIn");
+    const switchToSignUp = document.getElementById("switchToSignUp");
+    const switchToSignIn = document.getElementById("switchToSignIn");
 
-  let lastFocusedElement;
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
 
-  function openModal() {
-    lastFocusedElement = document.activeElement;
-    modal.classList.add("open");
-    overlay.classList.add("open");
-    document.body.style.overflow = "hidden";
-    document.getElementById("loginEmail").focus();
-  }
+    const authMessage = document.getElementById("authMessage");
 
-  function closeModal() {
-    modal.classList.remove("open");
-    overlay.classList.remove("open");
-    document.body.style.overflow = "";
-    if (lastFocusedElement) lastFocusedElement.focus();
-  }
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
 
-  if (openBtn) openBtn.addEventListener("click", openModal);
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  if (overlay) overlay.addEventListener("click", closeModal);
+    const registerName = document.getElementById("registerName");
+    const registerEmail = document.getElementById("registerEmail");
+    const registerPassword = document.getElementById("registerPassword");
 
-  // ESC close
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !modal.hidden) {
-    closeModal();
-  }
-});
+    let lastFocusedElement = null;
 
-  // Switch forms
-switchToSignUp.addEventListener('click', () => {
-  signInForm.hidden = true;
-  signUpForm.hidden = false;
-  document.getElementById('registerName').focus();
-});
+    function showGlobalMessage(message, type = "success") {
+        if (!authMessage) return;
 
-switchToSignIn.addEventListener('click', () => {
-  signUpForm.hidden = true;
-  signInForm.hidden = false;
-  document.getElementById('loginEmail').focus();
-});
+        authMessage.textContent = message;
+        authMessage.className = "auth-message show " + type;
 
-// Validation helper
-function showError(input, message) {
-  const error = document.getElementById(input.id + "Error");
-  error.textContent = message;
-  input.setAttribute("aria-invalid", "true");
-}
+        setTimeout(() => {
+            authMessage.className = "auth-message";
+            authMessage.textContent = "";
+        }, 4000);
+    }
 
-function clearError(input) {
-  const error = document.getElementById(input.id + "Error");
-  error.textContent = "";
-  input.removeAttribute("aria-invalid");
-}
+    function showError(input, message) {
+        if (!input) return;
+        const error = document.getElementById(input.id + "Error");
+        if (error) error.textContent = message;
+        input.setAttribute("aria-invalid", "true");
+    }
 
-// LOGIN
-document.getElementById('loginForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  
-  const email = loginEmail;
-  const password = loginPassword;
+    function clearError(input) {
+        if (!input) return;
+        const error = document.getElementById(input.id + "Error");
+        if (error) error.textContent = "";
+        input.removeAttribute("aria-invalid");
+    }
 
-  let valid = true;
+    function clearAllErrors() {
+        [loginEmail, loginPassword, registerName, registerEmail, registerPassword].forEach((input) => {
+            if (input) clearError(input);
+        });
+    }
 
-  if (!email.value) {
-    showError(email, "Email is required");
-    valid = false;
-  } else {
-    clearError(email);
-  }
+    function openModal() {
+        if (!modal || !overlay) return;
 
-  if (!password.value) {
-    showError(password, "Password is required");
-    valid = false;
-  } else {
-    clearError(password);
-  }
+        lastFocusedElement = document.activeElement;
+        modal.classList.add("open");
+        overlay.classList.add("open");
+        modal.setAttribute("aria-hidden", "false");
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
 
-  if (valid) {
-    alert("Signed in successfully (demo)");
-    closeModal();
-  }
-});
+        if (loginEmail) loginEmail.focus();
+    }
 
-// REGISTER
-document.getElementById('registerForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  
-  const name = registerName;
-  const email = registerEmail;
-  const password = registerPassword;
+    function closeModal() {
+        if (!modal || !overlay) return;
 
-  let valid = true;
+        modal.classList.remove("open");
+        overlay.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
+        overlay.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
 
-  if (!name.value) {
-    showError(name, "Name is required");
-    valid = false;
-  } else {
-    clearError(name);
-  }
+        clearAllErrors();
 
-  if (!email.value) {
-    showError(email, "Email is required");
-    valid = false;
-  } else {
-    clearError(email);
-  }
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+        }
+    }
 
-  if (password.value.length < 6) {
-    showError(password, "Password must be at least 6 characters");
-    valid = false;
-  } else {
-    clearError(password);
-  }
+    function switchToSignupForm() {
+        if (!signInFormBlock || !signUpFormBlock) return;
 
-  if (valid) {
-    alert("Account created successfully (demo)");
-    closeModal();
-  }
-});
+        signInFormBlock.hidden = true;
+        signUpFormBlock.hidden = false;
+        clearAllErrors();
+
+        if (registerName) registerName.focus();
+    }
+
+    function switchToSigninForm() {
+        if (!signInFormBlock || !signUpFormBlock) return;
+
+        signUpFormBlock.hidden = true;
+        signInFormBlock.hidden = false;
+        clearAllErrors();
+
+        if (loginEmail) loginEmail.focus();
+    }
+
+    function validateLoginForm() {
+        let valid = true;
+
+        if (!loginEmail.value.trim()) {
+            showError(loginEmail, "Email is required.");
+            valid = false;
+        } else {
+            clearError(loginEmail);
+        }
+
+        if (!loginPassword.value.trim()) {
+            showError(loginPassword, "Password is required.");
+            valid = false;
+        } else {
+            clearError(loginPassword);
+        }
+
+        return valid;
+    }
+
+    function validateRegisterForm() {
+        let valid = true;
+
+        if (!registerName.value.trim()) {
+            showError(registerName, "Full name is required.");
+            valid = false;
+        } else if (registerName.value.trim().length < 2) {
+            showError(registerName, "Name must be at least 2 characters.");
+            valid = false;
+        } else {
+            clearError(registerName);
+        }
+
+        if (!registerEmail.value.trim()) {
+            showError(registerEmail, "Email is required.");
+            valid = false;
+        } else {
+            clearError(registerEmail);
+        }
+
+        if (!registerPassword.value.trim()) {
+            showError(registerPassword, "Password is required.");
+            valid = false;
+        } else if (registerPassword.value.length < 6) {
+            showError(registerPassword, "Password must be at least 6 characters.");
+            valid = false;
+        } else {
+            clearError(registerPassword);
+        }
+
+        return valid;
+    }
+
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        if (!validateRegisterForm()) return;
+
+        const formData = new FormData();
+        formData.append("name", registerName.value.trim());
+        formData.append("email", registerEmail.value.trim());
+        formData.append("password", registerPassword.value);
+
+        try {
+            const response = await fetch("register.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showGlobalMessage(result.message, "success");
+                registerForm.reset();
+                switchToSigninForm();
+            } else {
+                showGlobalMessage(result.message, "error");
+            }
+        } catch (error) {
+            showGlobalMessage("Registration failed. Please check your PHP server and database.", "error");
+        }
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+
+        if (!validateLoginForm()) return;
+
+        const formData = new FormData();
+        formData.append("email", loginEmail.value.trim());
+        formData.append("password", loginPassword.value);
+
+        try {
+            const response = await fetch("login.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showGlobalMessage(result.message, "success");
+                loginForm.reset();
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1200);
+            } else {
+                showGlobalMessage(result.message, "error");
+            }
+        } catch (error) {
+            showGlobalMessage("Login failed. Please check your PHP server and database.", "error");
+        }
+    }
+
+    function trapFocus(e) {
+        if (!modal || !modal.classList.contains("open")) return;
+        if (e.key !== "Tab") return;
+
+        const focusable = modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+            if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            }
+        } else if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
+
+    if (openBtn) openBtn.addEventListener("click", openModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (overlay) overlay.addEventListener("click", closeModal);
+    if (switchToSignUp) switchToSignUp.addEventListener("click", switchToSignupForm);
+    if (switchToSignIn) switchToSignIn.addEventListener("click", switchToSigninForm);
+    if (registerForm) registerForm.addEventListener("submit", handleRegister);
+    if (loginForm) loginForm.addEventListener("submit", handleLogin);
+
+    document.addEventListener("keydown", (e) => {
+        if (!modal) return;
+        if (e.key === "Escape" && modal.classList.contains("open")) {
+            closeModal();
+        }
+    });
+
+    if (modal) {
+        modal.addEventListener("keydown", trapFocus);
+    }
 });
