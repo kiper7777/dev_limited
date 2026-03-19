@@ -325,6 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+//chat bot
 
 document.addEventListener("DOMContentLoaded", () => {
     const chatbotToggle = document.getElementById("chatbotToggle");
@@ -335,42 +336,61 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatbotForm = document.getElementById("chatbotForm");
     const chatbotInput = document.getElementById("chatbotInput");
     const quickActions = document.querySelectorAll(".quick-action");
+    const switchLiveChat = document.getElementById("switchLiveChat");
+    const chatbotModeLabel = document.getElementById("chatbotModeLabel");
 
     if (!chatbotToggle || !chatbotWindow || !chatbotMessages || !chatbotForm || !chatbotInput) {
         return;
     }
 
     let chatbotOpenedOnce = false;
+    let liveMode = false;
+    let pollingInterval = null;
+    let chatSessionId = localStorage.getItem("dev_chat_session_id") || "";
+    const storageKey = "dev_limited_chat_history";
+
+    function saveHistory() {
+        localStorage.setItem(storageKey, chatbotMessages.innerHTML);
+    }
+
+    function loadHistory() {
+        const history = localStorage.getItem(storageKey);
+        if (history) {
+            chatbotMessages.innerHTML = history;
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+    }
 
     function openChatbot() {
         chatbotWindow.hidden = false;
+        chatbotWindow.classList.remove("closing");
+        requestAnimationFrame(() => {
+            chatbotWindow.classList.add("open");
+        });
+        chatbotWindow.setAttribute("aria-hidden", "false");
         chatbotToggle.setAttribute("aria-expanded", "true");
-        setTimeout(() => chatbotInput.focus(), 50);
+
+        setTimeout(() => chatbotInput.focus(), 120);
 
         if (!chatbotOpenedOnce) {
             chatbotOpenedOnce = true;
             setTimeout(() => {
                 addBotMessage("You can ask me about website development, client dashboards, CRM features, SEO setup, booking systems, admin panels, eCommerce, or project timelines.");
-            }, 600);
+            }, 500);
         }
     }
 
     function closeChatbot() {
-        chatbotWindow.hidden = true;
+        chatbotWindow.classList.remove("open");
+        chatbotWindow.classList.add("closing");
+        chatbotWindow.setAttribute("aria-hidden", "true");
         chatbotToggle.setAttribute("aria-expanded", "false");
-        chatbotToggle.focus();
+
+        setTimeout(() => {
+            chatbotWindow.hidden = true;
+            chatbotWindow.classList.remove("closing");
+        }, 200);
     }
-
-    chatbotToggle.addEventListener("click", () => {
-        if (chatbotWindow.hidden) {
-            openChatbot();
-        } else {
-            closeChatbot();
-        }
-    });
-
-    chatbotClose.addEventListener("click", closeChatbot);
-    chatbotMinimize.addEventListener("click", closeChatbot);
 
     function addMessage(text, type = "bot") {
         const wrapper = document.createElement("div");
@@ -383,6 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper.appendChild(bubble);
         chatbotMessages.appendChild(wrapper);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        saveHistory();
     }
 
     function addUserMessage(text) {
@@ -393,7 +414,13 @@ document.addEventListener("DOMContentLoaded", () => {
         addMessage(text, "bot");
     }
 
+    function addOperatorMessage(text) {
+        addMessage(text, "operator");
+    }
+
     function addTypingIndicator() {
+        removeTypingIndicator();
+
         const wrapper = document.createElement("div");
         wrapper.className = "chat-message bot";
         wrapper.id = "typingIndicator";
@@ -430,120 +457,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (text.includes("price") || text.includes("pricing") || text.includes("cost") || text.includes("budget")) {
-            return `
-                Pricing depends on project scope. Typical requests include:
-                <ul class="bot-list">
-                    <li>Landing page website</li>
-                    <li>Corporate multi-page website</li>
-                    <li>Client dashboard / portal</li>
-                    <li>CRM-integrated business platform</li>
-                    <li>eCommerce website</li>
-                </ul>
-                You can submit your requirements in your dashboard and select exact features for a tailored estimate.
-            `;
+            return `Pricing depends on project scope. We can build landing pages, corporate websites, dashboards, CRM systems and eCommerce platforms. Submit your requirements in your dashboard for a tailored estimate.`;
         }
 
-        if (text.includes("dashboard") || text.includes("client portal")) {
-            return `
-                We can build a custom dashboard with:
-                <ul class="bot-list">
-                    <li>user authentication</li>
-                    <li>profile management</li>
-                    <li>project request forms</li>
-                    <li>quotes and invoices</li>
-                    <li>file uploads</li>
-                    <li>status tracking</li>
-                    <li>CRM messaging</li>
-                </ul>
-            `;
+        if (text.includes("dashboard")) {
+            return `We can build custom dashboards with user authentication, profile management, project request forms, file uploads, status tracking and CRM messaging.`;
         }
 
         if (text.includes("crm")) {
-            return `
-                Our CRM features can include:
-                <ul class="bot-list">
-                    <li>lead management</li>
-                    <li>project pipeline tracking</li>
-                    <li>client notes</li>
-                    <li>internal comments</li>
-                    <li>message history</li>
-                    <li>quote management</li>
-                </ul>
-            `;
+            return `CRM features can include lead management, project pipeline tracking, notes, message history, quote management and client updates.`;
         }
 
-        if (text.includes("timeline") || text.includes("deadline") || text.includes("how long")) {
-            return "Project timelines usually depend on complexity. A landing page may take 1–2 weeks, while a custom dashboard or CRM platform can take several weeks or more depending on features and integrations.";
+        if (text.includes("timeline") || text.includes("deadline")) {
+            return `A landing page may take around 1–2 weeks, while a full dashboard or CRM platform can take several weeks depending on complexity.`;
         }
 
-        if (text.includes("seo")) {
-            return "Yes, we can include SEO-friendly structure, metadata, semantic HTML, speed optimisation, responsive design, and accessibility improvements as part of the project.";
+        if (text.includes("book consultation") || text.includes("consultation")) {
+            return `You can book a consultation through the contact section or submit a project request in your dashboard with your goals and requested features.`;
         }
 
-        if (text.includes("booking")) {
-            return "Yes, we can build booking systems with availability selection, admin management, email notifications, payment integration, and client dashboards.";
-        }
-
-        if (text.includes("ecommerce") || text.includes("shop") || text.includes("store")) {
-            return "We can develop eCommerce websites with product management, categories, checkout, customer accounts, payment integration, shipping logic, and admin reporting.";
-        }
-
-        if (text.includes("admin") || text.includes("admin panel")) {
-            return "Yes, we can create a secure admin panel for content management, users, project requests, CRM data, leads, quotes, and analytics.";
-        }
-
-        if (text.includes("features") || text.includes("functions") || text.includes("options")) {
-            return `
-                Popular website options include:
-                <ul class="bot-list">
-                    <li>authentication system</li>
-                    <li>user dashboard</li>
-                    <li>admin panel</li>
-                    <li>CRM integration</li>
-                    <li>contact forms</li>
-                    <li>live chat</li>
-                    <li>blog / CMS</li>
-                    <li>analytics</li>
-                    <li>payment integration</li>
-                    <li>booking functionality</li>
-                    <li>file uploads</li>
-                    <li>multi-language support</li>
-                </ul>
-            `;
-        }
-
-        if (text.includes("consultation") || text.includes("call") || text.includes("meeting")) {
-            return "You can book a consultation through the contact section or submit a project request in your client dashboard with your business goals, website type, and preferred features.";
-        }
-
-        if (text.includes("contact")) {
-            return "You can reach Dev Limited through the contact section on the website, submit a request form, or use your dashboard after login to send a direct project enquiry.";
-        }
-
-        if (text.includes("login") || text.includes("sign in") || text.includes("register")) {
-            return "You can create an account through Sign Up, verify your email, and then access your dashboard to submit website requests, choose features, upload files, and communicate with the team.";
-        }
-
-        if (text.includes("webflow") || text.includes("design") || text.includes("ui") || text.includes("saas")) {
-            return "Our design approach combines premium SaaS-style UI, strong visual hierarchy, responsive layouts, dark modern aesthetics, smooth animations, and conversion-focused user flows.";
-        }
-
-        if (text.includes("thank")) {
-            return "You’re welcome. I’m here if you want help choosing the right feature set for your website.";
-        }
-
-        return `
-            I can help with:
-            <ul class="bot-list">
-                <li>website pricing</li>
-                <li>dashboard features</li>
-                <li>CRM options</li>
-                <li>project timelines</li>
-                <li>admin panels</li>
-                <li>SEO and integrations</li>
-            </ul>
-            Try asking: <em>“What dashboard features can you build?”</em>
-        `;
+        return `I can help with website pricing, dashboard features, CRM options, timelines, SEO, admin panels and project planning.`;
     }
 
     function handleBotResponse(message) {
@@ -551,27 +484,193 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
             removeTypingIndicator();
-            const reply = getBotReply(message);
-            addBotMessage(reply);
+            addBotMessage(getBotReply(message));
         }, 650);
     }
 
-    chatbotForm.addEventListener("submit", (e) => {
+    async function ensureLiveSession() {
+        if (chatSessionId) return chatSessionId;
+
+        try {
+            const response = await fetch("chat_create_session.php", {
+                method: "POST"
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                chatSessionId = result.session_id;
+                localStorage.setItem("dev_chat_session_id", chatSessionId);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+        return chatSessionId;
+    }
+
+    async function sendLiveMessage(message) {
+        const sessionId = await ensureLiveSession();
+        if (!sessionId) {
+            addBotMessage("Live chat is currently unavailable. Please try again later.");
+            return;
+        }
+
+        try {
+            await fetch("chat_send_message.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    sender_type: "client",
+                    message: message
+                })
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function pollLiveMessages() {
+        if (!liveMode || !chatSessionId) return;
+
+        try {
+            const response = await fetch(`chat_fetch_messages.php?session_id=${encodeURIComponent(chatSessionId)}`);
+            const result = await response.json();
+
+            if (result.success && Array.isArray(result.messages)) {
+                const existing = new Set(
+                    Array.from(chatbotMessages.querySelectorAll("[data-message-id]")).map(el => el.dataset.messageId)
+                );
+
+                result.messages.forEach((msg) => {
+                    if (existing.has(String(msg.id))) return;
+
+                    const wrapper = document.createElement("div");
+                    wrapper.className = `chat-message ${msg.sender_type === "operator" ? "operator" : "user"}`;
+                    wrapper.dataset.messageId = msg.id;
+
+                    const bubble = document.createElement("div");
+                    bubble.className = "message-bubble";
+                    bubble.textContent = msg.message;
+
+                    wrapper.appendChild(bubble);
+                    chatbotMessages.appendChild(wrapper);
+                });
+
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                saveHistory();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function enableLiveMode() {
+        liveMode = true;
+        chatbotModeLabel.textContent = "Live operator mode";
+        addBotMessage("You are now connected to live operator mode. Your messages will be sent to the Dev Limited admin panel.");
+
+        if (!pollingInterval) {
+            pollingInterval = setInterval(pollLiveMessages, 3000);
+        }
+    }
+
+    function disableLiveMode() {
+        liveMode = false;
+        chatbotModeLabel.textContent = "Assistant mode";
+
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    }
+
+    chatbotToggle.addEventListener("click", (e) => {
         e.preventDefault();
+        e.stopPropagation();
+
+        if (chatbotWindow.hidden) {
+            openChatbot();
+        } else {
+            closeChatbot();
+        }
+    });
+
+    if (chatbotClose) {
+        chatbotClose.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeChatbot();
+        });
+    }
+
+    if (chatbotMinimize) {
+        chatbotMinimize.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeChatbot();
+        });
+    }
+
+    if (switchLiveChat) {
+        switchLiveChat.addEventListener("click", async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!liveMode) {
+                enableLiveMode();
+                await ensureLiveSession();
+                await pollLiveMessages();
+            } else {
+                disableLiveMode();
+                addBotMessage("Switched back to assistant mode.");
+            }
+        });
+    }
+
+    chatbotForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
         const message = chatbotInput.value.trim();
         if (!message) return;
 
         addUserMessage(message);
         chatbotInput.value = "";
-        handleBotResponse(message);
+
+        if (liveMode) {
+            await sendLiveMessage(message);
+            addBotMessage("Your message has been sent to a live operator.");
+        } else {
+            handleBotResponse(message);
+        }
     });
 
     quickActions.forEach((button) => {
-        button.addEventListener("click", () => {
-            const text = button.textContent.trim();
+        button.addEventListener("click", async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const text = button.dataset.message || button.textContent.trim();
             addUserMessage(text);
-            handleBotResponse(text);
+
+            if (liveMode) {
+                await sendLiveMessage(text);
+                addBotMessage("Your message has been sent to a live operator.");
+            } else {
+                handleBotResponse(text);
+            }
         });
     });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !chatbotWindow.hidden) {
+            closeChatbot();
+        }
+    });
+
+    loadHistory();
 });
+
