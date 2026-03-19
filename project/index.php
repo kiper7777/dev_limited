@@ -437,9 +437,9 @@ session_start();
                 </form>
 
                 <p class="switch-text">
-                    Еще не зарегистрирован?
+                    Not registered yet?
                     <button class="link-button" id="switchToSignUp" type="button">
-                        Нажми здесь
+                       Click here
                     </button>
                 </p>
             </div>
@@ -474,7 +474,7 @@ session_start();
                 </form>
 
                 <p class="switch-text">
-                    Уже есть аккаунт?
+                    Already have an account?
                     <button class="link-button" id="switchToSignIn" type="button">
                         Sign In
                     </button>
@@ -482,6 +482,90 @@ session_start();
             </div>
         </div>
     </div>
+
+
+    <!-- Chatbot Button -->
+<button
+  class="chatbot-toggle"
+  id="chatbotToggle"
+  type="button"
+  aria-label="Open chat assistant"
+  aria-expanded="false"
+  aria-controls="chatbotWindow"
+>
+  <span class="chatbot-toggle-icon">💬</span>
+</button>
+
+<!-- Chatbot Window -->
+<section
+  class="chatbot-window"
+  id="chatbotWindow"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="chatbotTitle"
+  hidden
+>
+  <div class="chatbot-header">
+    <div class="chatbot-brand">
+      <div class="chatbot-avatar">DL</div>
+      <div>
+        <h2 id="chatbotTitle">Dev Limited Assistant</h2>
+        <p class="chatbot-status">
+          <span class="status-dot"></span>
+          Online now
+        </p>
+      </div>
+    </div>
+
+    <div class="chatbot-header-actions">
+      <button class="chatbot-icon-btn" id="chatbotMinimize" type="button" aria-label="Minimize chat">–</button>
+      <button class="chatbot-icon-btn" id="chatbotClose" type="button" aria-label="Close chat">×</button>
+    </div>
+  </div>
+
+  <div class="chatbot-body" id="chatbotMessages" aria-live="polite" aria-label="Chat messages">
+    <div class="chat-message bot">
+      <div class="message-bubble">
+        Hello! I’m the Dev Limited assistant. I can help you with:
+        <ul class="bot-list">
+          <li>website packages</li>
+          <li>pricing guidance</li>
+          <li>features and integrations</li>
+          <li>dashboard / CRM options</li>
+          <li>project request support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="chat-message bot">
+      <div class="message-bubble">
+        Try one of the quick actions below or type your question.
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-quick-actions" id="chatbotQuickActions">
+    <button type="button" class="quick-action">Website pricing</button>
+    <button type="button" class="quick-action">Dashboard features</button>
+    <button type="button" class="quick-action">CRM options</button>
+    <button type="button" class="quick-action">Project timeline</button>
+    <button type="button" class="quick-action">Book consultation</button>
+  </div>
+
+  <form class="chatbot-form" id="chatbotForm">
+    <label for="chatbotInput" class="visually-hidden">Type your message</label>
+    <input
+      type="text"
+      id="chatbotInput"
+      class="chatbot-input"
+      placeholder="Ask about pricing, features, CRM, dashboard..."
+      autocomplete="off"
+      maxlength="500"
+      required
+    />
+    <button class="chatbot-send" type="submit" aria-label="Send message">Send</button>
+  </form>
+</section>
 
 
     <!-- Scripts -->
