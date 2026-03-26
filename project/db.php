@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username   = "root";
 $password   = "";
-$database   = "dev_limited";
+$database   = "devin_limited";
 
 $conn = mysqli_connect($servername, $username, $password, $database);
 
