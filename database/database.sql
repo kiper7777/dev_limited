@@ -1,6 +1,6 @@
-CREATE DATABASE dev_limited CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE devin_limited CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE dev_limited;
+USE devin_limited;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
