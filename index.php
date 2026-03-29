@@ -1,6 +1,8 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/functions.php';
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,12 +20,12 @@ session_start();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css" />
 </head>
 
 <body>
 
-<?php include "header.php"; ?>
+<?php include __DIR__ . '/includes/header.php'; ?>
 
     <!-- Hero -->
     <main>
@@ -568,7 +570,10 @@ session_start();
 
 
     <!-- Scripts -->
-    <script src="script.js"></script>
+    <script>
+    window.BASE_URL = "<?php echo BASE_URL; ?>";
+    </script>
+    <script src="<?php echo BASE_URL; ?>/script.js?v=2"></script>
 
 </body>
 

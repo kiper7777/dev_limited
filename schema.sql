@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS devin_limited CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE dev_limited;
+USE devin_limited;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,7 +15,7 @@ CREATE TABLE users (
     is_online TINYINT(1) NOT NULL DEFAULT 0,
     last_seen DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE services (
@@ -163,3 +163,15 @@ INSERT INTO feature_options (name, category, description, price) VALUES
 ('SEO Setup', 'Marketing', 'On-page SEO and metadata', 180.00),
 ('Analytics', 'Marketing', 'Analytics integration', 140.00),
 ('Accessibility WCAG AA', 'Quality', 'Accessibility improvements', 190.00);
+
+// admin_roles
+INSERT INTO users (role, name, email, password, email_verified)
+VALUES (
+    'admin',
+    'Admin',
+    'admin@devlimited.local',
+    '$2y$10$z3qFv5i7a8Yx5g2sF9fD2.BS0u4G4S1gWQ3vV2y4aT0v6K5Qq7m2K',
+    1
+);
+
+Admin123!

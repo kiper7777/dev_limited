@@ -1,82 +1,76 @@
 <?php
-require "db.php";
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/functions.php';
 
-header("Content-Type: application/json");
-
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    echo json_encode([
-        "success" => false,
-        "message" => "Invalid request method."
-    ]);
-    exit;
+if (!is_post()) {
+    json_response([
+        'success' => false,
+        'message' => 'Invalid request method.'
+    ], 405);
 }
 
-$email = trim($_POST["email"] ?? "");
-$password = $_POST["password"] ?? "";
+$email = post('email');
+$password = $_POST['password'] ?? '';
 
-if ($email === "" || $password === "") {
-    echo json_encode([
-        "success" => false,
-        "message" => "Please fill in all fields."
-    ]);
-    exit;
+if ($email === '' || $password === '') {
+    json_response([
+        'success' => false,
+        'message' => 'Please fill in all fields.'
+    ], 422);
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Please enter a valid email address."
-    ]);
-    exit;
+    json_response([
+        'success' => false,
+        'message' => 'Please enter a valid email address.'
+    ], 422);
 }
 
-$sql = "SELECT id, name, email, password FROM users WHERE email = ?";
+$sql = "SELECT id, role, name, email, password FROM users WHERE email = ? LIMIT 1";
 $stmt = mysqli_prepare($conn, $sql);
 
 if (!$stmt) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Database error: failed to prepare login query."
-    ]);
-    exit;
+    json_response([
+        'success' => false,
+        'message' => 'Database error: failed to prepare login query.',
+        'debug' => APP_DEBUG ? mysqli_error($conn) : null
+    ], 500);
 }
 
-mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_bind_param($stmt, 's', $email);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-
 $user = mysqli_fetch_assoc($result);
 
-if (!$user) {
-    echo json_encode([
-        "success" => false,
-        "message" => "User not found."
-    ]);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-    exit;
-}
-
-if (!password_verify($password, $user["password"])) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Incorrect password."
-    ]);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-    exit;
-}
-
-$_SESSION["user_id"] = $user["id"];
-$_SESSION["user_name"] = $user["name"];
-$_SESSION["user_email"] = $user["email"];
-
-echo json_encode([
-    "success" => true,
-    "message" => "Welcome, " . $user["name"] . "!",
-    "name" => $user["name"]
-]);
-
 mysqli_stmt_close($stmt);
-mysqli_close($conn);
-?>
+
+if (!$user) {
+    json_response([
+        'success' => false,
+        'message' => 'User not found.'
+    ], 404);
+}
+
+if (!password_verify($password, $user['password'])) {
+    json_response([
+        'success' => false,
+        'message' => 'Incorrect password.'
+    ], 401);
+}
+
+session_regenerate_id(true);
+
+$_SESSION['user_id'] = (int)$user['id'];
+$_SESSION['user_name'] = $user['name'];
+$_SESSION['user_email'] = $user['email'];
+$_SESSION['role'] = $user['role'];
+
+json_response([
+    'success' => true,
+    'message' => 'Welcome, ' . $user['name'] . '!',
+    'role' => $user['role'],
+    'redirect' => $user['role'] === 'admin'
+        ? BASE_URL . '/admin/dashboard.php'
+        : BASE_URL . '/dashboard/index.php'
+]);

@@ -218,67 +218,78 @@ document.addEventListener("DOMContentLoaded", function () {
         return valid;
     }
 
-    async function handleRegister(e) {
-        e.preventDefault();
+  async function handleRegister(e) {
+    e.preventDefault();
 
-        if (!validateRegisterForm()) return;
+    if (!validateRegisterForm()) return;
 
-        const formData = new FormData();
-        formData.append("name", registerName.value.trim());
-        formData.append("email", registerEmail.value.trim());
-        formData.append("password", registerPassword.value);
+    const formData = new FormData();
+    formData.append("name", registerName.value.trim());
+    formData.append("email", registerEmail.value.trim());
+    formData.append("password", registerPassword.value);
 
-        try {
-            const response = await fetch("register.php", {
-                method: "POST",
-                body: formData
-            });
+    try {
+        const response = await fetch("register.php", {
+            method: "POST",
+            body: formData
+        });
 
-            const result = await response.json();
+        const result = await response.json();
 
-            if (result.success) {
-                showGlobalMessage(result.message, "success");
-                registerForm.reset();
-                switchToSigninForm();
-            } else {
-                showGlobalMessage(result.message, "error");
+        if (result.success) {
+            showGlobalMessage(result.message, "success");
+            registerForm.reset();
+
+            setTimeout(() => {
+                window.location.href = result.redirect || "/project/dashboard/index.php";
+            }, 1200);
+        } else {
+            showGlobalMessage(result.message || "Registration failed.", "error");
+            if (result.debug) {
+                console.error(result.debug);
             }
-        } catch (error) {
-            showGlobalMessage("Registration failed. Please check your PHP server and database.", "error");
         }
+    } catch (error) {
+        console.error(error);
+        showGlobalMessage("Registration failed. Please check your PHP server and database.", "error");
     }
+}
 
     async function handleLogin(e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        if (!validateLoginForm()) return;
+    if (!validateLoginForm()) return;
 
-        const formData = new FormData();
-        formData.append("email", loginEmail.value.trim());
-        formData.append("password", loginPassword.value);
+    const formData = new FormData();
+    formData.append("email", loginEmail.value.trim());
+    formData.append("password", loginPassword.value);
 
-        try {
-            const response = await fetch("login.php", {
-                method: "POST",
-                body: formData
-            });
+    try {
+        const response = await fetch("login.php", {
+            method: "POST",
+            body: formData
+        });
 
-            const result = await response.json();
+        const result = await response.json();
 
-            if (result.success) {
-                showGlobalMessage(result.message, "success");
-                loginForm.reset();
+        if (result.success) {
+            showGlobalMessage(result.message, "success");
+            loginForm.reset();
 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1200);
-            } else {
-                showGlobalMessage(result.message, "error");
+            setTimeout(() => {
+                window.location.href = result.redirect || "/project/dashboard/index.php";
+            }, 1200);
+        } else {
+            showGlobalMessage(result.message || "Login failed.", "error");
+            if (result.debug) {
+                console.error(result.debug);
             }
-        } catch (error) {
-            showGlobalMessage("Login failed. Please check your PHP server and database.", "error");
         }
+    } catch (error) {
+        console.error(error);
+        showGlobalMessage("Login failed. Please check your PHP server and database.", "error");
     }
+}
 
     function trapFocus(e) {
         if (!modal || !modal.classList.contains("open")) return;
