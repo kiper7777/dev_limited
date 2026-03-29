@@ -1,0 +1,22 @@
+[
+  {
+    "keywords": ["price", "pricing", "cost", "budget"],
+    "answer": "Pricing depends on scope. Typical projects include landing pages, business websites, dashboards, CRM systems and ongoing maintenance."
+  },
+  {
+    "keywords": ["dashboard", "portal"],
+    "answer": "We can build secure dashboards with authentication, profile management, file uploads, project tracking and CRM messaging."
+  },
+  {
+    "keywords": ["crm", "lead"],
+    "answer": "CRM can include lead management, request statuses, quote tracking, notes, unread counters and admin workflows."
+  },
+  {
+    "keywords": ["timeline", "deadline", "how long"],
+    "answer": "A landing page may take around 1-2 weeks. Custom dashboards or CRM projects usually take several weeks depending on complexity."
+  },
+  {
+    "keywords": ["maintenance", "support"],
+    "answer": "Yes, we offer website maintenance, technical support, content updates and feature upgrades."
+  }
+]
