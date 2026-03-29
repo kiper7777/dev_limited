@@ -545,6 +545,10 @@ session_start();
         <button type="button" class="quick-action" data-message="CRM options">CRM options</button>
         <button type="button" class="quick-action" data-message="Project timeline">Project timeline</button>
         <button type="button" class="quick-action" data-message="Book consultation">Book consultation</button>
+
+        <button type="button" class="quick-action" data-message="Create project request">Create project request</button>
+        <button type="button" class="quick-action" data-message="Talk to manager">Talk to manager</button>
+        <button type="button" class="quick-action" data-message="Start website quiz">Start website quiz</button>
     </div>
 
     <form class="chatbot-form" id="chatbotForm" novalidate>

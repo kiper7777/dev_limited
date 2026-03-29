@@ -349,6 +349,120 @@ document.addEventListener("DOMContentLoaded", () => {
     let chatSessionId = localStorage.getItem("dev_chat_session_id") || "";
     const storageKey = "dev_limited_chat_history";
 
+    //quiz
+    let quizState = {
+    active: false,
+    step: 0,
+    data: {
+        website_type: "",
+        budget_range: "",
+        timeline: "",
+        required_features: "",
+        full_name: "",
+        email: "",
+        phone: "",
+        company_name: "",
+        message: ""
+    }
+};
+
+const quizSteps = [
+    { key: "website_type", question: "What type of website do you need? Example: landing page, business website, dashboard, eCommerce." },
+    { key: "budget_range", question: "What is your budget range?" },
+    { key: "timeline", question: "What is your preferred timeline?" },
+    { key: "required_features", question: "What features do you need? Example: admin panel, CRM, payments, chat, booking." },
+    { key: "full_name", question: "What is your full name?" },
+    { key: "email", question: "What is your email address?" },
+    { key: "phone", question: "What is your phone number?" },
+    { key: "company_name", question: "What is your company name?" },
+    { key: "message", question: "Anything else you'd like to add?" }
+];
+
+async function fetchFaqReply(message) {
+    const response = await fetch("api/chatbot_reply.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+    });
+    return response.json();
+}
+
+async function saveQuizLead() {
+    const response = await fetch("api/create_lead_from_quiz.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(quizState.data)
+    });
+
+    return response.json();
+}
+
+function startQuiz() {
+    quizState.active = true;
+    quizState.step = 0;
+    addBotMessage("Great. Let’s build your website brief together.");
+    addBotMessage(quizSteps[0].question);
+}
+
+async function handleQuizAnswer(text) {
+    const currentStep = quizSteps[quizState.step];
+    quizState.data[currentStep.key] = text;
+
+    quizState.step += 1;
+
+    if (quizState.step < quizSteps.length) {
+        addBotMessage(quizSteps[quizState.step].question);
+        return;
+    }
+
+
+
+    if (quizState.active) {
+    await handleQuizAnswer(message);
+    return;
+    }
+
+    if (message.toLowerCase() === "start website quiz" || message.toLowerCase() === "create project request") {
+        startQuiz();
+        return;
+    }
+
+    if (message.toLowerCase() === "talk to manager") {
+        if (!liveMode) {
+            enableLiveMode();
+            await ensureLiveSession();
+            await pollLiveMessages();
+        }
+        addBotMessage("You are now connected to live operator mode.");
+        return;
+    }
+
+    if (liveMode) {
+        await sendLiveMessage(message);
+        addBotMessage("Your message has been sent to a live operator.");
+    } else {
+        const result = await fetchFaqReply(message);
+        addBotMessage(result.answer);
+    }
+
+
+
+
+
+
+    quizState.active = false;
+    addBotMessage("Thank you. I’m saving your project lead now...");
+
+    const result = await saveQuizLead();
+    if (result.success) {
+        addBotMessage("Your project request has been saved successfully. A manager can review it soon.");
+    } else {
+        addBotMessage("I couldn’t save your lead. Please try again later.");
+    }
+}
+
+
+
     function saveHistory() {
         localStorage.setItem(storageKey, chatbotMessages.innerHTML);
     }
@@ -477,6 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return `I can help with website pricing, dashboard features, CRM options, timelines, SEO, admin panels and project planning.`;
+        
     }
 
     function handleBotResponse(message) {
