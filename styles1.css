@@ -1298,15 +1298,3 @@ textarea:focus {
     clip: rect(0 0 0 0);
     white-space: nowrap;
 }
-
-
-
-.dashboard-sidebar{
-    display: flex;
-    justify-content: space-around;
-}
-
-.dashboard-main{
-    margin: 50px;
-
-}

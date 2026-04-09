@@ -13,7 +13,7 @@ $services = mysqli_query($conn, "SELECT * FROM services WHERE is_active = 1 ORDE
     <link rel="stylesheet" href="/project/styles.css">
 </head>
 <body>
-<?php include __DIR__ . '/../includes/header.php'; ?>
+<!-- <?php include __DIR__ . '/../includes/header.php'; ?> -->
 
 <div class="form-wrap">
     <h1>Create Website Request</h1>
