@@ -343,7 +343,7 @@ require_once __DIR__ . '/includes/functions.php';
 
                 <div class="card contact-form-card">
                     <h3>Project inquiry</h3>
-                    <form class="contact-form" action="#" method="post">
+                    <form class="contact-form" id="contactForm" novalidate>
                         <div class="form-field">
                             <label for="name">Full name</label>
                             <input type="text" id="name" name="name" placeholder="Anna Smith" required />
@@ -571,9 +571,28 @@ require_once __DIR__ . '/includes/functions.php';
 
     <!-- Scripts -->
     <script>
-    window.BASE_URL = "<?php echo BASE_URL; ?>";
+        window.BASE_URL = "<?php echo BASE_URL; ?>";
     </script>
     <script src="<?php echo BASE_URL; ?>/script.js?v=2"></script>
+
+    <script>
+        document.getElementById('contactForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const response = await fetch('<?php echo BASE_URL; ?>/api/save_contact.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        if (result.success) {
+            this.reset();
+        }
+        });
+    </script>
 
 </body>
 

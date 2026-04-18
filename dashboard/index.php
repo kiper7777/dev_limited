@@ -50,42 +50,147 @@ require_login();
 </div>
 
 <script>
-async function loadUserRequests() {
-    const response = await fetch('<?php echo BASE_URL; ?>/api/get_user_requests.php');
-    const result = await response.json();
+    async function loadUserRequests() {
+        const response = await fetch('<?php echo BASE_URL; ?>/api/get_user_requests.php');
+        const result = await response.json();
 
-    const list = document.getElementById('userRequestsList');
-    list.innerHTML = '';
+        const list = document.getElementById('userRequestsList');
+        list.innerHTML = '';
 
-    result.items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'dashboard-card';
-        card.innerHTML = `
-            <h3>${item.project_name}</h3>
-            <p>Status: <strong>${item.status}</strong></p>
-            <p>Budget: ${item.budget_range || '-'}</p>
-            <p>Timeline: ${item.timeline || '-'}</p>
-            <button type="button" onclick="cancelRequest(${item.id})">Cancel request</button>
-        `;
-        list.appendChild(card);
-    });
-}
+        result.items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'dashboard-card';
+            card.innerHTML = `
+                <h3>${item.project_name}</h3>
+                <p>Status: <strong>${item.status}</strong></p>
+                <p>Budget: ${item.budget_range || '-'}</p>
+                <p>Timeline: ${item.timeline || '-'}</p>
+                <button type="button" onclick="cancelRequest(${item.id})">Cancel request</button>
+            `;
+            list.appendChild(card);
+        });
+    }
 
-async function cancelRequest(id) {
-    const formData = new FormData();
-    formData.append('request_id', id);
+    async function cancelRequest(id) {
+        const formData = new FormData();
+        formData.append('request_id', id);
 
-    const response = await fetch('<?php echo BASE_URL; ?>/api/delete_request.php', {
-        method: 'POST',
-        body: formData
-    });
+        const response = await fetch('<?php echo BASE_URL; ?>/api/delete_request.php', {
+            method: 'POST',
+            body: formData
+        });
 
-    const result = await response.json();
-    alert(result.message);
+        const result = await response.json();
+        alert(result.message);
+        loadUserRequests();
+    }
+
     loadUserRequests();
-}
-
-loadUserRequests();
 </script>
+
+<script>
+    let drawerSessionId = null;
+    let drawerInterval = null;
+
+    const openDrawerBtn = document.getElementById('openAdminChatPanel');
+    const closeDrawerBtn = document.getElementById('closeAdminChatDrawer');
+    const drawer = document.getElementById('adminChatDrawer');
+    const drawerMessages = document.getElementById('drawerMessages');
+    const drawerForm = document.getElementById('drawerChatForm');
+    const drawerInput = document.getElementById('drawerChatInput');
+    const badge = document.getElementById('chatUnreadBadge');
+
+    async function ensureDrawerSession() {
+        if (drawerSessionId) return drawerSessionId;
+
+        const response = await fetch('<?php echo BASE_URL; ?>/api/chat_create_session.php', {
+            method: 'POST'
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            drawerSessionId = result.session_id;
+        }
+
+        return drawerSessionId;
+    }
+
+    async function loadDrawerMessages() {
+        if (!drawerSessionId) return;
+
+        const response = await fetch('<?php echo BASE_URL; ?>/api/chat_fetch_messages.php?viewer=client&session_id=' + encodeURIComponent(drawerSessionId));
+        const result = await response.json();
+
+        if (!result.success) return;
+
+        drawerMessages.innerHTML = '';
+
+        result.messages.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = 'dashboard-card';
+            div.style.marginBottom = '10px';
+            div.innerHTML = `<strong>${msg.sender_type}</strong><br>${msg.message ?? ''}`;
+            drawerMessages.appendChild(div);
+        });
+
+        drawerMessages.scrollTop = drawerMessages.scrollHeight;
+    }
+
+    async function loadUnreadBadge() {
+        const sessionId = await ensureDrawerSession();
+        if (!sessionId) return;
+
+        const response = await fetch('<?php echo BASE_URL; ?>/api/chat_fetch_messages.php?viewer=client&session_id=' + encodeURIComponent(sessionId));
+        const result = await response.json();
+
+        if (!result.success) return;
+
+        const unreadCount = result.messages.filter(m => m.sender_type === 'operator').length;
+        badge.textContent = unreadCount;
+        badge.hidden = unreadCount === 0;
+    }
+
+    openDrawerBtn?.addEventListener('click', async () => {
+        drawer.hidden = false;
+        await ensureDrawerSession();
+        await loadDrawerMessages();
+
+        if (!drawerInterval) {
+            drawerInterval = setInterval(loadDrawerMessages, 3000);
+        }
+    });
+
+    closeDrawerBtn?.addEventListener('click', () => {
+        drawer.hidden = true;
+        if (drawerInterval) {
+            clearInterval(drawerInterval);
+            drawerInterval = null;
+        }
+    });
+
+    drawerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const text = drawerInput.value.trim();
+        if (!text) return;
+
+        await fetch('<?php echo BASE_URL; ?>/api/chat_send_message.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: drawerSessionId,
+                sender_type: 'client',
+                message: text
+            })
+        });
+
+        drawerInput.value = '';
+        await loadDrawerMessages();
+    });
+
+    loadUnreadBadge();
+    setInterval(loadUnreadBadge, 5000);
+</script>
+
 </body>
 </html>
