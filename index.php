@@ -353,6 +353,10 @@ require_once __DIR__ . '/includes/functions.php';
                             <input type="email" id="email" name="email" placeholder="you@company.com" required />
                         </div>
                         <div class="form-field">
+                            <label for="phone">Phone number</label>
+                            <input type="text" id="phone" name="phone" placeholder="+44 7..." />
+                        </div>
+                        <div class="form-field">
                             <label for="company">Company</label>
                             <input type="text" id="company" name="company" placeholder="Company name" />
                         </div>

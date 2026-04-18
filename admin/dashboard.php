@@ -7,6 +7,7 @@ $usersCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM 
 $requestsCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM project_requests"))['c'];
 $leadsCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM leads"))['c'];
 $unreadAdmin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COALESCE(SUM(unread_for_admin),0) AS c FROM chat_sessions"))['c'];
+$unreadNotifications = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id = " . (int)$_SESSION['user_id'] . " AND is_read = 0"))['c'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,8 +22,10 @@ $unreadAdmin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COALESCE(SUM(unrea
 <div class="dashboard-layout">
     <aside class="dashboard-sidebar">
         <a href="<?php echo BASE_URL; ?>/admin/dashboard.php">Overview</a>
+        <a href="<?php echo BASE_URL; ?>/admin/users.php">Users</a>
         <a href="<?php echo BASE_URL; ?>/admin/requests.php">Requests</a>
-        <a href="<?php echo BASE_URL; ?>/admin/chat.php">Live Chat <?php echo $unreadAdmin > 0 ? '(' . (int)$unreadAdmin . ')' : ''; ?></a>
+        <a href="<?php echo BASE_URL; ?>/admin/leads.php">Leads <?php if ($unreadNotifications > 0): ?><span class="badge"><?php echo (int)$unreadNotifications; ?></span><?php endif; ?></a>
+        <a href="<?php echo BASE_URL; ?>/admin/chat.php">Live Chat <?php if ($unreadAdmin > 0): ?><span class="badge"><?php echo (int)$unreadAdmin; ?></span><?php endif; ?></a>
     </aside>
 
     <main class="dashboard-main">

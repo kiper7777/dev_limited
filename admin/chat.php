@@ -16,13 +16,16 @@ require_once __DIR__ . '/../includes/functions.php';
 <div class="dashboard-layout">
     <aside class="dashboard-sidebar">
         <a href="<?php echo BASE_URL; ?>/admin/dashboard.php">Overview</a>
+        <a href="<?php echo BASE_URL; ?>/admin/users.php">Users</a>
         <a href="<?php echo BASE_URL; ?>/admin/requests.php">Requests</a>
+        <a href="<?php echo BASE_URL; ?>/admin/leads.php">Leads</a>
         <a href="<?php echo BASE_URL; ?>/admin/chat.php">Live Chat</a>
     </aside>
 
     <main class="dashboard-main">
         <h1>Admin Live Chat</h1>
-        <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;">
+
+        <div class="admin-chat-grid">
             <div class="dashboard-card">
                 <h3>Sessions</h3>
                 <div id="adminSessions"></div>
@@ -30,9 +33,9 @@ require_once __DIR__ . '/../includes/functions.php';
 
             <div class="dashboard-card">
                 <h3>Conversation</h3>
-                <div id="adminMessages" style="height:420px;overflow-y:auto;margin-bottom:15px;"></div>
+                <div id="adminMessages" class="admin-messages-box"></div>
 
-                <form id="adminChatForm">
+                <form id="adminChatForm" class="drawer-form">
                     <input type="text" id="adminChatInput" placeholder="Type reply..." required>
                     <button type="submit" class="btn btn-primary btn-sm">Send reply</button>
                 </form>
