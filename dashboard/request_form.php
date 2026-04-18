@@ -10,7 +10,7 @@ $services = mysqli_query($conn, "SELECT * FROM services WHERE is_active = 1 ORDE
 <head>
     <meta charset="UTF-8">
     <title>Create Request - Dev Limited</title>
-    <link rel="stylesheet" href="/project/styles.css">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <!-- <?php include __DIR__ . '/../includes/header.php'; ?> -->

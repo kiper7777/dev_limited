@@ -1,6 +1,18 @@
 CREATE DATABASE IF NOT EXISTS devin_limited CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE devin_limited;
 
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS chat_sessions;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS leads;
+DROP TABLE IF EXISTS project_request_services;
+DROP TABLE IF EXISTS project_request_features;
+DROP TABLE IF EXISTS project_requests;
+DROP TABLE IF EXISTS feature_options;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     role ENUM('client','admin') NOT NULL DEFAULT 'client',
@@ -52,7 +64,7 @@ CREATE TABLE project_requests (
     status ENUM('draft','submitted','in_review','quoted','approved','in_progress','completed','cancelled') NOT NULL DEFAULT 'submitted',
     estimated_price DECIMAL(10,2) DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -163,15 +175,3 @@ INSERT INTO feature_options (name, category, description, price) VALUES
 ('SEO Setup', 'Marketing', 'On-page SEO and metadata', 180.00),
 ('Analytics', 'Marketing', 'Analytics integration', 140.00),
 ('Accessibility WCAG AA', 'Quality', 'Accessibility improvements', 190.00);
-
-// admin_roles
-INSERT INTO users (role, name, email, password, email_verified)
-VALUES (
-    'admin',
-    'Admin',
-    'admin@devlimited.local',
-    '$2y$10$z3qFv5i7a8Yx5g2sF9fD2.BS0u4G4S1gWQ3vV2y4aT0v6K5Qq7m2K',
-    1
-);
-
-Admin123!

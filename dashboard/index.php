@@ -1,10 +1,8 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
-// include __DIR__ . '/../includes/header.php';
 require_login();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +12,7 @@ require_login();
 </head>
 <body>
 
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
 <div class="dashboard-layout">
     <aside class="dashboard-sidebar">

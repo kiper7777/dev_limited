@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return valid;
     }
 
-  async function handleRegister(e) {
+ async function handleRegister(e) {
     e.preventDefault();
 
     if (!validateRegisterForm()) return;
@@ -229,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("password", registerPassword.value);
 
     try {
-        const response = await fetch("register.php", {
+        const response = await fetch(`${window.BASE_URL}/register.php`, {
             method: "POST",
             body: formData
         });
@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
             registerForm.reset();
 
             setTimeout(() => {
-                window.location.href = result.redirect || "/project/dashboard/index.php";
+                window.location.href = result.redirect || `${window.BASE_URL}/dashboard/index.php`;
             }, 1200);
         } else {
             showGlobalMessage(result.message || "Registration failed.", "error");
@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 }
 
-    async function handleLogin(e) {
+   async function handleLogin(e) {
     e.preventDefault();
 
     if (!validateLoginForm()) return;
@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("password", loginPassword.value);
 
     try {
-        const response = await fetch("login.php", {
+        const response = await fetch(`${window.BASE_URL}/login.php`, {
             method: "POST",
             body: formData
         });
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
             loginForm.reset();
 
             setTimeout(() => {
-                window.location.href = result.redirect || "/project/dashboard/index.php";
+                window.location.href = result.redirect || `${window.BASE_URL}/dashboard/index.php`;
             }, 1200);
         } else {
             showGlobalMessage(result.message || "Login failed.", "error");
@@ -425,41 +425,6 @@ async function handleQuizAnswer(text) {
         addBotMessage(quizSteps[quizState.step].question);
         return;
     }
-
-
-
-    if (quizState.active) {
-    await handleQuizAnswer(message);
-    return;
-    }
-
-    if (message.toLowerCase() === "start website quiz" || message.toLowerCase() === "create project request") {
-        startQuiz();
-        return;
-    }
-
-    if (message.toLowerCase() === "talk to manager") {
-        if (!liveMode) {
-            enableLiveMode();
-            await ensureLiveSession();
-            await pollLiveMessages();
-        }
-        addBotMessage("You are now connected to live operator mode.");
-        return;
-    }
-
-    if (liveMode) {
-        await sendLiveMessage(message);
-        addBotMessage("Your message has been sent to a live operator.");
-    } else {
-        const result = await fetchFaqReply(message);
-        addBotMessage(result.answer);
-    }
-
-
-
-
-
 
     quizState.active = false;
     addBotMessage("Thank you. I’m saving your project lead now...");
@@ -618,7 +583,7 @@ async function handleQuizAnswer(text) {
         if (chatSessionId) return chatSessionId;
 
         try {
-            const response = await fetch("chat_create_session.php", {
+            const response = await fetch(`${window.BASE_URL}/api/chat_create_session.php`, {
                 method: "POST"
             });
             const result = await response.json();
@@ -642,7 +607,7 @@ async function handleQuizAnswer(text) {
         }
 
         try {
-            await fetch("chat_send_message.php", {
+            await fetch(`${window.BASE_URL}/api/chat_send_message.php`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -662,7 +627,7 @@ async function handleQuizAnswer(text) {
         if (!liveMode || !chatSessionId) return;
 
         try {
-            const response = await fetch(`chat_fetch_messages.php?session_id=${encodeURIComponent(chatSessionId)}`);
+            const response = await fetch(`${window.BASE_URL}/api/chat_fetch_messages.php?session_id=${encodeURIComponent(chatSessionId)}`);
             const result = await response.json();
 
             if (result.success && Array.isArray(result.messages)) {
@@ -757,22 +722,42 @@ async function handleQuizAnswer(text) {
     }
 
     chatbotForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-        const message = chatbotInput.value.trim();
-        if (!message) return;
+    const message = chatbotInput.value.trim();
+    if (!message) return;
 
-        addUserMessage(message);
-        chatbotInput.value = "";
+    addUserMessage(message);
+    chatbotInput.value = "";
 
-        if (liveMode) {
-            await sendLiveMessage(message);
-            addBotMessage("Your message has been sent to a live operator.");
-        } else {
-            handleBotResponse(message);
+    if (quizState.active) {
+        await handleQuizAnswer(message);
+        return;
+    }
+
+    if (message.toLowerCase() === "start website quiz" || message.toLowerCase() === "create project request") {
+        startQuiz();
+        return;
+    }
+
+    if (message.toLowerCase() === "talk to manager") {
+        if (!liveMode) {
+            enableLiveMode();
+            await ensureLiveSession();
+            await pollLiveMessages();
         }
-    });
+        addBotMessage("You are now connected to live operator mode.");
+        return;
+    }
+
+    if (liveMode) {
+        await sendLiveMessage(message);
+        addBotMessage("Your message has been sent to a live operator.");
+    } else {
+        handleBotResponse(message);
+    }
+});
 
     quickActions.forEach((button) => {
         button.addEventListener("click", async (e) => {
