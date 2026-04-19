@@ -12,7 +12,7 @@ if ($sessionToken === "" || $senderType === "" || $message === "") {
     json_response(["success" => false, "message" => "Invalid input."]);
 }
 
-$sessionSql = "SELECT id FROM chat_sessions WHERE session_token = ?";
+$sessionSql = "SELECT id, user_id FROM chat_sessions WHERE session_token = ?";
 $sessionStmt = mysqli_prepare($conn, $sessionSql);
 mysqli_stmt_bind_param($sessionStmt, "s", $sessionToken);
 mysqli_stmt_execute($sessionStmt);
@@ -33,6 +33,14 @@ if ($senderType === 'client') {
     mysqli_query($conn, "UPDATE chat_sessions SET unread_for_admin = unread_for_admin + 1 WHERE id = " . (int)$session['id']);
 } elseif ($senderType === 'operator') {
     mysqli_query($conn, "UPDATE chat_sessions SET unread_for_user = unread_for_user + 1 WHERE id = " . (int)$session['id']);
+
+    if (!empty($session['user_id'])) {
+        $title = 'New admin message';
+        $body = 'You have received a new message from Dev Limited support.';
+        $n = mysqli_prepare($conn, "INSERT INTO notifications (user_id, title, body) VALUES (?, ?, ?)");
+        mysqli_stmt_bind_param($n, "iss", $session['user_id'], $title, $body);
+        mysqli_stmt_execute($n);
+    }
 }
 
 json_response(["success" => $ok]);

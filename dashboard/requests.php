@@ -28,6 +28,8 @@ $result = mysqli_stmt_get_result($stmt);
         <a href="<?php echo BASE_URL; ?>/dashboard/request_form.php">Create Request</a>
         <a href="<?php echo BASE_URL; ?>/dashboard/services.php">Services</a>
         <a href="<?php echo BASE_URL; ?>/dashboard/profile.php">Profile</a>
+        <a href="<?php echo BASE_URL; ?>/dashboard/payments.php">Payments</a>
+        <a href="<?php echo BASE_URL; ?>/dashboard/notifications.php">Notifications <span id="notificationsBadge" class="badge" hidden>0</span></a>
         <button id="openAdminChatPanel" type="button">Chat with admin <span id="chatUnreadBadge" class="badge" hidden>0</span></button>
     </aside>
 
@@ -45,6 +47,19 @@ $result = mysqli_stmt_get_result($stmt);
                 <p><?php echo e($row['description']); ?></p>
 
                 <?php if (!in_array($row['status'], ['completed', 'cancelled'], true)): ?>
+                    <form class="request-edit-form" data-id="<?php echo (int)$row['id']; ?>">
+                        <input type="hidden" name="request_id" value="<?php echo (int)$row['id']; ?>">
+                        <div class="form-grid">
+                            <input type="text" name="project_name" value="<?php echo e($row['project_name']); ?>" required>
+                            <input type="text" name="budget_range" value="<?php echo e($row['budget_range']); ?>" placeholder="Budget range">
+                            <input type="text" name="timeline" value="<?php echo e($row['timeline']); ?>" placeholder="Timeline">
+                        </div>
+                        <textarea name="description" placeholder="Description"><?php echo e($row['description']); ?></textarea>
+                        <div class="inline-actions">
+                            <button type="submit" class="btn btn-sm btn-primary">Save changes</button>
+                        </div>
+                    </form>
+
                     <form method="post" action="<?php echo BASE_URL; ?>/api/delete_request.php" class="inline-form request-cancel-form">
                         <input type="hidden" name="request_id" value="<?php echo (int)$row['id']; ?>">
                         <button type="submit" class="btn btn-sm btn-ghost">Cancel request</button>
@@ -70,6 +85,24 @@ $result = mysqli_stmt_get_result($stmt);
 
             const result = await response.json();
             alert(result.message);
+            if (result.success) {
+                window.location.reload();
+            }
+        });
+    });
+
+    document.querySelectorAll('.request-edit-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const response = await fetch('<?php echo BASE_URL; ?>/api/update_request.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            alert(result.success ? 'Request updated.' : 'Failed to update request.');
             if (result.success) {
                 window.location.reload();
             }

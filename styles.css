@@ -1599,4 +1599,35 @@ textarea:focus {
 }
 
 
+/* unread card */
+.inline-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.unread-card {
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.drawer-file-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.drawer-file-form input[type="file"] {
+    flex: 1;
+}
+
+.form-wrap-small {
+    max-width: 700px;
+}
+
+.admin-chat-drawer[hidden] {
+    display: none !important;
+}
+
+
 

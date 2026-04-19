@@ -3,6 +3,15 @@ require_once __DIR__ . '/../includes/auth.php';
 require_admin();
 require_once __DIR__ . '/../includes/functions.php';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $leadId = (int)($_POST['lead_id'] ?? 0);
+    $status = trim($_POST['status'] ?? 'new');
+
+    $stmt = mysqli_prepare($conn, "UPDATE leads SET status = ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "si", $status, $leadId);
+    mysqli_stmt_execute($stmt);
+}
+
 $result = mysqli_query($conn, "SELECT * FROM leads ORDER BY id DESC");
 ?>
 <!DOCTYPE html>
@@ -40,6 +49,19 @@ $result = mysqli_query($conn, "SELECT * FROM leads ORDER BY id DESC");
                 <p>Timeline: <?php echo e($row['timeline']); ?></p>
                 <p>Features: <?php echo e($row['required_features']); ?></p>
                 <p>Message: <?php echo e($row['message']); ?></p>
+
+                <form method="post" class="inline-actions">
+                    <input type="hidden" name="lead_id" value="<?php echo (int)$row['id']; ?>">
+                    <select name="status">
+                        <option value="new">new</option>
+                        <option value="contacted">contacted</option>
+                        <option value="qualified">qualified</option>
+                        <option value="proposal_sent">proposal_sent</option>
+                        <option value="won">won</option>
+                        <option value="lost">lost</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Update lead</button>
+                </form>
             </div>
         <?php endwhile; ?>
     </main>

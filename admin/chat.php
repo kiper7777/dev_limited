@@ -119,5 +119,21 @@ require_once __DIR__ . '/../includes/functions.php';
         loadMessages();
     }, 3000);
 </script>
+
+<script>
+    async function setOperatorStatus(isOnline) {
+        const formData = new FormData();
+        formData.append('is_online', isOnline ? '1' : '0');
+
+        await fetch('<?php echo BASE_URL; ?>/api/operator_status.php', {
+            method: 'POST',
+            body: formData
+        });
+    }
+
+    window.addEventListener('load', () => setOperatorStatus(true));
+    window.addEventListener('beforeunload', () => navigator.sendBeacon('<?php echo BASE_URL; ?>/api/operator_status.php', new URLSearchParams({is_online: '0'})));
+</script>
+
 </body>
 </html>
