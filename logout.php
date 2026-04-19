@@ -1,7 +1,18 @@
 <?php
 require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
 
-session_unset();
+if (isset($_SESSION['user_id'])) {
+    $uid = (int)$_SESSION['user_id'];
+    mysqli_query($conn, "UPDATE users SET remember_token = NULL WHERE id = {$uid}");
+}
+
+$_SESSION = [];
+
+if (isset($_COOKIE['remember_token'])) {
+    setcookie('remember_token', '', time() - 3600, '/');
+}
+
 session_destroy();
 
 header('Location: ' . BASE_URL . '/index.php');

@@ -12,6 +12,7 @@ if (!is_post()) {
 
 $email = post('email');
 $password = $_POST['password'] ?? '';
+$rememberMe = (int)($_POST['remember_me'] ?? 0) === 1;
 
 if ($email === '' || $password === '') {
     json_response([
@@ -65,6 +66,23 @@ $_SESSION['user_id'] = (int)$user['id'];
 $_SESSION['user_name'] = $user['name'];
 $_SESSION['user_email'] = $user['email'];
 $_SESSION['role'] = $user['role'];
+
+if ($rememberMe) {
+    $rememberToken = bin2hex(random_bytes(32));
+    $stmtToken = mysqli_prepare($conn, "UPDATE users SET remember_token = ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmtToken, "si", $rememberToken, $user['id']);
+    mysqli_stmt_execute($stmtToken);
+
+    setcookie(
+        'remember_token',
+        $rememberToken,
+        time() + (86400 * 30),
+        '/',
+        '',
+        false,
+        true
+    );
+}
 
 json_response([
     'success' => true,

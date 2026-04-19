@@ -175,3 +175,23 @@ INSERT INTO feature_options (name, category, description, price) VALUES
 ('SEO Setup', 'Marketing', 'On-page SEO and metadata', 180.00),
 ('Analytics', 'Marketing', 'Analytics integration', 140.00),
 ('Accessibility WCAG AA', 'Quality', 'Accessibility improvements', 190.00);
+
+
+
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(190) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS email_verifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

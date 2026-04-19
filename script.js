@@ -264,6 +264,9 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("email", loginEmail.value.trim());
     formData.append("password", loginPassword.value);
 
+    const rememberMe = document.getElementById("rememberMe");
+    formData.append("remember_me", rememberMe && rememberMe.checked ? "1" : "0");
+
     try {
         const response = await fetch(`${window.BASE_URL}/login.php`, {
             method: "POST",

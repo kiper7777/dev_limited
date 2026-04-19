@@ -117,8 +117,15 @@ $_SESSION['user_name'] = $name;
 $_SESSION['user_email'] = $email;
 $_SESSION['role'] = 'client';
 
+$verifyToken = bin2hex(random_bytes(32));
+$expiresAt = date('Y-m-d H:i:s', time() + 86400);
+$v = mysqli_prepare($conn, "INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)");
+mysqli_stmt_bind_param($v, "iss", $userId, $verifyToken, $expiresAt);
+mysqli_stmt_execute($v);
+
 json_response([
     'success' => true,
     'message' => 'Registration successful. Welcome, ' . $name . '!',
+    'verify_link' => BASE_URL . '/verify_email.php?token=' . $verifyToken,
     'redirect' => BASE_URL . '/dashboard/index.php'
 ]);

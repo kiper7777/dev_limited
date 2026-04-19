@@ -439,8 +439,19 @@ require_once __DIR__ . '/includes/functions.php';
                         <span class="error-message" id="loginPasswordError" aria-live="polite"></span>
                     </div>
 
+                    <div class="form-field">
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-full">Sign In</button>
                 </form>
+
+                <p class="switch-text">
+    <a href="<?php echo BASE_URL; ?>/forgot_password.php">Forgot password?</a>
+</p>
 
                 <p class="switch-text">
                     Not registered yet?
