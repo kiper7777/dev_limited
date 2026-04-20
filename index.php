@@ -450,15 +450,17 @@ require_once __DIR__ . '/includes/functions.php';
                 </form>
 
                 <p class="switch-text">
-    <a href="<?php echo BASE_URL; ?>/forgot_password.php">Forgot password?</a>
-</p>
-
-                <p class="switch-text">
                     Not registered yet?
                     <button class="link-button" id="switchToSignUp" type="button">
                        Click here
                     </button>
                 </p>
+
+                <p class="switch-text">
+                    <a href="<?php echo BASE_URL; ?>/forgot_password.php">Forgot password?</a>
+                </p>
+
+
             </div>
 
 
