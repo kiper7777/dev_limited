@@ -1,17 +1,17 @@
 CREATE DATABASE IF NOT EXISTS devin_limited CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE devin_limited;
 
-DROP TABLE IF EXISTS notifications;
-DROP TABLE IF EXISTS chat_messages;
-DROP TABLE IF EXISTS chat_sessions;
-DROP TABLE IF EXISTS payments;
-DROP TABLE IF EXISTS leads;
-DROP TABLE IF EXISTS project_request_services;
-DROP TABLE IF EXISTS project_request_features;
-DROP TABLE IF EXISTS project_requests;
-DROP TABLE IF EXISTS feature_options;
-DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS feature_options;
+DROP TABLE IF EXISTS project_requests;
+DROP TABLE IF EXISTS project_request_features;
+DROP TABLE IF EXISTS project_request_services;
+DROP TABLE IF EXISTS leads;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS chat_sessions;
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS notifications;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
